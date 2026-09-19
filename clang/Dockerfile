@@ -5,7 +5,17 @@ ARG CLANG_VERSION
 ARG INSTALL_CLANG=false
 ENV DEBIAN_FRONTEND=noninteractive
 
-RUN apt-get update \
+RUN if grep -q "ID=debian" /etc/os-release; then \
+      . /etc/os-release; \
+      case "${VERSION_CODENAME:-}" in \
+        bullseye) \
+          echo "Debian Bullseye detected. Using a security repository snapshot..."; \
+          sed -i 's|http://deb\.debian\.org/debian-security|https://snapshot.debian.org/archive/debian-security/20260903T220410Z|g' /etc/apt/sources.list; \
+          echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99-ignore-valid-until; \
+          ;; \
+      esac; \
+    fi \
+    && apt-get update \
     && apt-get install --no-install-recommends --yes \
         ca-certificates \
         curl \
