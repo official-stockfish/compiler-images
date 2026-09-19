@@ -10,7 +10,7 @@ permissions:
   packages: write
 
 env:
-  IMAGE: ghcr.io/disservin/compiler-images
+  IMAGE: ghcr.io/official-stockfish/compiler-images
 
 jobs:
   publish:
