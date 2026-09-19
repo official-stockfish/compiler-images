@@ -22,6 +22,14 @@ RUN if grep -q "ID=debian" /etc/os-release; then \
         git \
         make \
     && if [ "${INSTALL_CLANG}" = "true" ]; then \
+         if [ "${CLANG_VERSION}" -gt 22 ]; then \
+           . /etc/os-release; \
+           curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
+             > /etc/apt/trusted.gpg.d/apt.llvm.org.asc; \
+           echo "deb http://apt.llvm.org/${VERSION_CODENAME}/ llvm-toolchain-${VERSION_CODENAME} main" \
+             > /etc/apt/sources.list.d/llvm.list; \
+           apt-get update; \
+         fi; \
          apt-get install --no-install-recommends --yes clang-${CLANG_VERSION}; \
          if [ "${CLANG_VERSION}" -ge 20 ]; then \
            apt-get install --no-install-recommends --yes lld; \
