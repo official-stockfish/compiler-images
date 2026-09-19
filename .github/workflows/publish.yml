@@ -38,6 +38,10 @@ jobs:
           - name: gcc-15
             context: gcc
             base_image: gcc:15
+          - name: gcc-16
+            context: gcc
+            base_image: gcc:16
+
           - name: clang-11
             context: clang
             base_image: silkeh/clang:11-bullseye
@@ -92,6 +96,16 @@ jobs:
             context: clang
             base_image: ubuntu:rolling
             clang_version: "21"
+            install_clang: true
+          - name: clang-22
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "22"
+            install_clang: true
+          - name: clang-23
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "23"
             install_clang: true
 
     steps:
