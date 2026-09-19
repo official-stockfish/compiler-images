@@ -1,0 +1,118 @@
+name: Publish compiler containers
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE: ghcr.io/disservin/cpp-compilers
+
+jobs:
+  publish:
+    name: ${{ matrix.name }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: gcc-10
+            context: gcc
+            base_image: gcc:10-bookworm
+          - name: gcc-11
+            context: gcc
+            base_image: gcc:11-bookworm
+          - name: gcc-12
+            context: gcc
+            base_image: gcc:12
+          - name: gcc-13
+            context: gcc
+            base_image: gcc:13
+          - name: gcc-14
+            context: gcc
+            base_image: gcc:14
+          - name: gcc-15
+            context: gcc
+            base_image: gcc:15
+          - name: clang-11
+            context: clang
+            base_image: silkeh/clang:11-bullseye
+            clang_version: "11"
+            install_clang: false
+          - name: clang-12
+            context: clang
+            base_image: silkeh/clang:12-bullseye
+            clang_version: "12"
+            install_clang: false
+          - name: clang-13
+            context: clang
+            base_image: silkeh/clang:13-bullseye
+            clang_version: "13"
+            install_clang: false
+          - name: clang-14
+            context: clang
+            base_image: silkeh/clang:14-bullseye
+            clang_version: "14"
+            install_clang: false
+          - name: clang-15
+            context: clang
+            base_image: silkeh/clang:15-bullseye
+            clang_version: "15"
+            install_clang: false
+          - name: clang-16
+            context: clang
+            base_image: silkeh/clang:16-bookworm
+            clang_version: "16"
+            install_clang: false
+          - name: clang-17
+            context: clang
+            base_image: silkeh/clang:17-bookworm
+            clang_version: "17"
+            install_clang: false
+          - name: clang-18
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "18"
+            install_clang: true
+          - name: clang-19
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "19"
+            install_clang: true
+          - name: clang-20
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "20"
+            install_clang: true
+          - name: clang-21
+            context: clang
+            base_image: ubuntu:rolling
+            clang_version: "21"
+            install_clang: true
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v4.0.0
+
+      - name: Log in to GHCR
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io --username "${{ github.actor }}" --password-stdin
+
+      - name: Build and push
+        run: |
+          docker buildx build \
+            --platform linux/amd64 \
+            --build-arg BASE_IMAGE="${{ matrix.base_image }}" \
+            --build-arg CLANG_VERSION="${{ matrix.clang_version }}" \
+            --build-arg INSTALL_CLANG="${{ matrix.install_clang }}" \
+            --label org.opencontainers.image.source="https://github.com/${{ github.repository }}" \
+            --tag "${IMAGE}:${{ matrix.name }}" \
+            --tag "${IMAGE}:${{ matrix.name }}-${{ github.sha }}" \
+            --push \
+            "${{ matrix.context }}"
