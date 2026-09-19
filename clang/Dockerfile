@@ -26,7 +26,7 @@ RUN if grep -q "ID=debian" /etc/os-release; then \
            . /etc/os-release; \
            curl -fsSL https://apt.llvm.org/llvm-snapshot.gpg.key \
              > /etc/apt/trusted.gpg.d/apt.llvm.org.asc; \
-           echo "deb http://apt.llvm.org/${VERSION_CODENAME}/ llvm-toolchain-${VERSION_CODENAME} main" \
+           echo "deb http://apt.llvm.org/${VERSION_CODENAME}/ llvm-toolchain-${VERSION_CODENAME}-${CLANG_VERSION} main" \
              > /etc/apt/sources.list.d/llvm.list; \
            apt-get update; \
          fi; \
