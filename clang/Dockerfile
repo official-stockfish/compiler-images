@@ -12,11 +12,15 @@ RUN apt-get update \
         git \
         make \
     && if [ "${INSTALL_CLANG}" = "true" ]; then \
-         apt-get install --no-install-recommends --yes \
-             clang-${CLANG_VERSION} \
-             lld \
-             lld-${CLANG_VERSION} \
-             llvm-${CLANG_VERSION}-dev \
-             llvm-${CLANG_VERSION}-linker-tools; \
+         apt-get install --no-install-recommends --yes clang-${CLANG_VERSION}; \
+         if [ "${CLANG_VERSION}" -ge 20 ]; then \
+           apt-get install --no-install-recommends --yes lld; \
+         fi; \
+         if [ "${CLANG_VERSION}" -gt 20 ]; then \
+           apt-get install --no-install-recommends --yes \
+               lld-${CLANG_VERSION} \
+               llvm-${CLANG_VERSION}-dev \
+               llvm-${CLANG_VERSION}-linker-tools; \
+         fi; \
        fi \
     && rm -rf /var/lib/apt/lists/*
